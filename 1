@@ -1,0 +1,70 @@
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local toggleButton = Instance.new("TextButton", screenGui)
+toggleButton.Size = UDim2.new(0, 100, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -50, 0.1, 0)
+toggleButton.Text = "Toggle Fire"
+toggleButton.BackgroundColor3 = Color3.new(1, 0, 0)
+
+local enabled = false
+local dragging = false
+local dragStart = nil
+local startPos = nil
+local fireCount = 1
+
+local fireCountBox = Instance.new("TextBox", screenGui)
+fireCountBox.Size = UDim2.new(0, 100, 0, 30)
+fireCountBox.Position = UDim2.new(0.5, -50, 0.25, 0)
+fireCountBox.PlaceholderText = "Fire Count"
+fireCountBox.Text = tostring(fireCount)
+fireCountBox.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
+
+fireCountBox.FocusLost:Connect(function()
+    local newCount = tonumber(fireCountBox.Text)
+    if newCount and newCount > 0 then
+        fireCount = newCount
+    else
+        fireCountBox.Text = tostring(fireCount)
+    end
+end)
+
+toggleButton.MouseButton1Click:Connect(function()
+    enabled = not enabled
+    toggleButton.BackgroundColor3 = enabled and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+    toggleButton.Text = enabled and "Fire On" or "Fire Off"
+end)
+
+toggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = toggleButton.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+toggleButton.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+        local delta = input.Position - dragStart
+        toggleButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        fireCountBox.Position = UDim2.new(toggleButton.Position.X.Scale, toggleButton.Position.X.Offset, toggleButton.Position.Y.Scale, toggleButton.Position.Y.Offset + 60)
+    end
+end)
+
+ProximityPromptService.PromptShown:Connect(function(prompt)
+    if enabled then
+        for i = 1, fireCount do
+            fireproximityprompt(prompt)
+        end
+    end
+end)
