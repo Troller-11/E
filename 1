@@ -9,7 +9,7 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 local toggleButton = Instance.new("TextButton", screenGui)
 toggleButton.Size = UDim2.new(0, 100, 0, 50)
 toggleButton.Position = UDim2.new(0.5, -50, 0.1, 0)
-toggleButton.Text = "Toggle Fire"
+toggleButton.Text = "Toggle Dupe"
 toggleButton.BackgroundColor3 = Color3.new(1, 0, 0)
 
 local enabled = false
@@ -37,7 +37,7 @@ end)
 toggleButton.MouseButton1Click:Connect(function()
     enabled = not enabled
     toggleButton.BackgroundColor3 = enabled and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-    toggleButton.Text = enabled and "Fire On" or "Fire Off"
+    toggleButton.Text = enabled and "Dupe On" or "Dupe Off"
 end)
 
 toggleButton.InputBegan:Connect(function(input)
